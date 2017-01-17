@@ -203,6 +203,7 @@ class YrData(object):
                 valid_to = dt_util.parse_datetime(time_entry['@to'])
 
                 loc_data = time_entry['location']
+                new_state = None
 
                 if dev.type not in loc_data or now >= valid_to:
                     continue
