@@ -4,9 +4,12 @@ from unittest.mock import patch
 from homeassistant.components.emulated_hue import Config, _LOGGER
 
 
-def test_config_google_home_entity_id_to_number():
+@patch('homeassistant.components.emulated_hue.Config._save_numbers_json')
+@patch('homeassistant.components.emulated_hue.Config._load_numbers_json',
+       return_value={})
+def test_config_google_home_entity_id_to_number(mock_load, mock_save):
     """Test config adheres to the type."""
-    conf = Config({
+    conf = Config(None, {
         'type': 'google_home'
     })
 
@@ -19,13 +22,15 @@ def test_config_google_home_entity_id_to_number():
     number = conf.entity_id_to_number('light.test2')
     assert number == '2'
 
+    assert mock_save.call_count == 2
+
     entity_id = conf.number_to_entity_id('1')
     assert entity_id == 'light.test'
 
 
 def test_config_alexa_entity_id_to_number():
     """Test config adheres to the type."""
-    conf = Config({
+    conf = Config(None, {
         'type': 'alexa'
     })
 
@@ -45,7 +50,7 @@ def test_config_alexa_entity_id_to_number():
 def test_warning_config_google_home_listen_port():
     """Test we warn when non-default port is used for Google Home."""
     with patch.object(_LOGGER, 'warning') as mock_warn:
-        Config({
+        Config(None, {
             'type': 'google_home',
             'host_ip': '123.123.123.123',
             'listen_port': 8300
